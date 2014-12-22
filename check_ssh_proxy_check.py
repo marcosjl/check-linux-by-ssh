@@ -61,10 +61,12 @@ def execute_check(client, check_path):
     if len(lines) == 0:
         return False
 
+    return_code = stdout.channel.recv_exit_status()
+
     # Before return, close the client
     client.close()
 
-    return lines[0].strip()
+    return return_code,lines[0].strip()
 
 
 parser = optparse.OptionParser(
@@ -106,7 +108,7 @@ if __name__ == '__main__':
 
     # Ok now connect, and try to get values for memory
     client = schecks.connect(hostname, port, ssh_key_file, passphrase, user)
-    result = execute_check(client, check_path)
+    nagios_status,nagios_text= execute_check(client, check_path)
 
-    print result
-    sys.exit(0)
+    print nagios_text
+    sys.exit(nagios_status)
